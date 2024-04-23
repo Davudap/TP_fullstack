@@ -14,8 +14,8 @@ const login = async(email,password) => {
     if (result){
             // retorno token
             //jwt.sign('payload','secret_key','options')
-            //const token = jwt.sign({ foo: 'bar' }, 'secret_key');    
-            const token = "fgdgbrfeer6g1df23g86ef2gs";
+            //Creo un token con un limite de 2hs
+            const token = jwt.sign({email: email, password: password}, 'secret_key', {expiresIn:"2h"});    
             return token;
     }
     return null; // retorno 

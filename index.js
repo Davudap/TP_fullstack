@@ -7,6 +7,10 @@ const mongoose  = require("mongoose")
 // controlllers
 const UsrController     = require('./controllers/user')
 const PelucheController = require('./controllers/peluches')
+const AuthController    = require('./controllers/auth')
+
+// Middleware
+const Middleware = require('./middleware/auth-middleware');
 
 app.use(express.json())
 
@@ -28,6 +32,25 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
+/*
+  Login de usuario
+*/
+
+app.post("/auth/login", async (req,res) => {
+
+  const email = req.body.email;
+  const password = req.body.password;
+  try{
+    const result = await AuthController.login(email,password);
+    if(result){
+      res.status(200).json(result);
+    }else{
+      res.status(401).send("No puede estar aqui")
+    }
+  }catch(error){
+      res.status(500).send("Error");
+  }  
+})
 
 // crear usuarios
 app.post('/usuarios', async (req, res) => {
@@ -51,7 +74,7 @@ app.post('/usuarios', async (req, res) => {
 
 
 // crear peluches
-app.post('/peluches', async (req, res) =>{
+app.post('/peluches', Middleware.verify, async (req, res) =>{
   let color             = req.body.color;
   let tipo              = req.body.tipo;
   let accesorio         = req.body.accesorio;
@@ -71,7 +94,7 @@ app.post('/peluches', async (req, res) =>{
 })
 
 //obtener los peluches del usuario
-app.get('/peluches/:email', async(req, res) =>{
+app.get('/peluches/:email', Middleware.verify, async(req, res) =>{
   
   try{
     const results = await PelucheController.getPeluchesPropietario(req.params.email);
@@ -82,16 +105,8 @@ app.get('/peluches/:email', async(req, res) =>{
   }
 }) 
 
-// top de los 3 peluches mas elegidos
-app.get('/peluches', async(req, res) => {
-
-  const results = await PelucheController.getTopPeluches();
-  res.status(200).json(results);
-
-})
-
 // Borrar peluche
-app.delete('/peluches/:id', async(req, res) =>{
+app.delete('/peluches/:id', Middleware.verify, async(req, res) =>{
 
   try{
     const result = await PelucheController.deletePeluche(req.params.id);
@@ -108,7 +123,7 @@ app.delete('/peluches/:id', async(req, res) =>{
 });
 
 // Actualizar peluche
-app.put('/peluches/:id', async (req, res) => {
+app.put('/peluches/:id', Middleware.verify, async (req, res) => {
   const peluche = {_id: req.params.id, ...req.body};
   try{
       
@@ -124,25 +139,15 @@ app.put('/peluches/:id', async (req, res) => {
 
 })
 
-/*
-  Login de usuario
-*/
 
-app.post("/auth/login", async (req,res) => {
+// top de los 3 peluches mas elegidos
+app.get('/peluches', async(req, res) => {
 
-  const email = req.body.email;
-  const password = req.body.password;
-  try{
-    const result = await AuthController.login(email,password);
-    if(result){
-      res.status(200).json(result);
-    }else{
-      res.status(401).send("No puede estar aqui")
-    }
-  }catch(error){
-      res.status(500).send("Error");
-  }  
+  const results = await PelucheController.getTopPeluches();
+  res.status(200).json(results);
+
 })
+
 
 http.listen(PORT, ()=>{
     console.log(`server corriendo ${PORT}`)

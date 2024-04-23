@@ -23,7 +23,8 @@ const addUser = async (name, lastname, email, password) =>{
         });
 
         let user = await usr.save();
-        console.log('usuario nuevo');
+
+        console.log('\nusuario nuevo');
         console.log(user);
         return {user};
     }

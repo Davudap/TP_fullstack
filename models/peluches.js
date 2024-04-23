@@ -10,7 +10,7 @@ const pelucheSchema = new Schema({
     },
     tipo: { 
         type: String,
-        enum: ['oso', 'conejo', 'perro', 'mapache', 'gato'], 
+        enum: ['oso', 'conejo', 'perro', 'mapache', 'gato'],
         required: true 
     },
     accesorio: {

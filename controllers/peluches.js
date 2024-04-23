@@ -6,7 +6,6 @@ const addPeluche = async (color, tipo, accesorio, email_propietario) =>{
 
     // Verificamos primero si existe el usuario
     let existUser = await usrModel.findOne({email:email_propietario});
-    console.log(existUser);
 
 
     if(!existUser){
@@ -22,7 +21,7 @@ const addPeluche = async (color, tipo, accesorio, email_propietario) =>{
         })
 
         let peluche = await pelu.save();
-        console.log('peluche nuevo');
+        console.log('\npeluche nuevo');
         console.log(peluche);
         return {peluche};
     }
@@ -31,13 +30,31 @@ const addPeluche = async (color, tipo, accesorio, email_propietario) =>{
 
 const deletePeluche = async (id) =>{
     const result = await pelucheModel.findByIdAndDelete(id);
-    return result;
+    
+    if(!result){
+        return false;
+    }
+    else{
+        console.log('\npeluche eliminado')
+        console.log(result)
+        return result;
+    }
+    
 }
 
 const updatePeluche = async (peluche) =>{
-    const result = await pelucheModel.findByIdAndUpdate(peluche._id, peluche);
 
-    return result;
+    const result = await pelucheModel.findByIdAndUpdate(peluche._id, peluche, {runValidators: true, returnOriginal: false});
+
+    if(!result){
+        return false;
+    }
+    else{
+        console.log('\npeluche actualizado')
+        console.log(result)
+        return result;
+    }
+
 }
 
 const getPeluchesPropietario = async (email_propietario)=>{
